@@ -9,7 +9,7 @@ namespace TaskManagerTelegramBot
 {
     public class Worker : BackgroundService
     {
-        readonly string Token = "";
+        readonly string Token = "8597751564:AAHZmAMcwdV-2FzwipaOGm_ymxXvcUBkNgs";
         TelegramBotClient TelegramBotClient;
         List<Users> Users = new List<Users>();
         Timer Timer;
@@ -94,7 +94,7 @@ namespace TaskManagerTelegramBot
                     {
                         await TelegramBotClient.SendMessage(
                             chatId,
-                            $"Уведомить пользователя: {Event.Time.ToString("HH:mm dd:MM:yyyy")}"
+                            $"Уведомить пользователя: {Event.Time.ToString("HH:mm dd.MM.yyyy")}"
                             + $"\nСообщение: {Event.Message}",
                             replyMarkup: DeleteEvent(Event.Message)
                             );
@@ -172,22 +172,38 @@ namespace TaskManagerTelegramBot
         {
             Console.WriteLine("Ошибка: " +exception.Message);
         }
+
+        public async void Tick(object obj)
+        {
+            string TimeNow = DateTime.Now.ToString("HH:mm dd.MM.yyyy");
+            foreach(Users User in Users)
+            {
+                for(int i = 0; i < User.Events.Count; i++)
+                {
+                    if (User.Events[i].Time.ToString("HH:mm dd.MM.yyyy") != TimeNow) continue;
+
+                    await TelegramBotClient.SendMessage(User.IdUser,
+                        "Напоминание: " + User.Events[i].Message);
+                    User.Events.Remove(User.Events[i]);
+                }
+            }
+        }
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            TelegramBotClient = new TelegramBotClient(Token);
+            TelegramBotClient.StartReceiving(
+                HandleUpdateAsync,
+                HandleErrorAsync,
+                null,
+                new CancellationTokenSource().Token);
+            TimerCallback timerCallback = new TimerCallback(Tick);
+            Timer = new Timer(timerCallback,0,0,60*1000);
+        }
         private readonly ILogger<Worker> _logger;
 
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
         }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(1000, stoppingToken);
-            }
-        }
-
-
     }
 }
