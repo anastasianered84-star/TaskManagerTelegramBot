@@ -231,8 +231,8 @@ namespace TaskManagerTelegramBot
                             message.Chat.Id,
                             $"✅ Создано повторяющееся событие:\n" +
                             $"Каждый {GetDaysString(days)} в {time:hh\\:mm}\n" +
-                            $"Сообщение: {eventMessage}\n" +
-                            $"⏰ Следующее напоминание: {DateTime.Today.Add(time):HH:mm dd.MM.yyyy}");
+                            $"Сообщение: {eventMessage}\n" 
+                            );
                     }
                     else
                     {
