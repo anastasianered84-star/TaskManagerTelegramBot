@@ -5,7 +5,7 @@ namespace TaskManagerTelegramBot.Classes
 {
     public static class DatabaseHelper
     {
-        private static string _connectionString = "server=localhost;database=taskmanagerbot;user=root;password=;";
+        private static string _connectionString = "server=localhost;Port=3307;database=taskmanagerbot;user=root;password=;";
         public static void InitializeDatabase()
         {
             using (var connection = new MySqlConnection(_connectionString))
